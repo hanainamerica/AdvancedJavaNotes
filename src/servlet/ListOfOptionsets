@@ -1,0 +1,98 @@
+package servlet;
+
+//This servlet, which interacts with the client, to get the list of available OptionSets
+
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import model.Automobile;
+
+import java.util.*;
+
+
+@WebServlet(name = "ListOfModels", urlPatterns ={"/servlet/options"})
+public class ListOfOptionsets extends HttpServlet {
+
+    private ServletClient client;
+    private HttpSession session;
+
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public ListOfOptionsets() {
+        super();
+    }
+
+    public void init()
+    {
+    	client = ServletClient.getNewClient();
+    }
+
+    /**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+    public void doGet(HttpServletRequest request,
+                      HttpServletResponse response)
+        throws ServletException, IOException {
+        session = request.getSession(true);
+        String modelname = request.getParameter("modelname");
+        Automobile auto = client.getModel(modelname);
+        request.getSession().setAttribute("auto", auto);
+        ArrayList<String> opsetsname = auto.getOptionsetsName();
+
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+        out.println("<!DOCTYPE html>");
+        out.println("<html lang=\"en\">");
+        out.println("<head>");
+        out.println("<meta charset=\"UTF-8\">");
+        out.println("<title>Car Configurator - select options</title>");
+        out.println("</head>");
+        out.println("<body>");
+        out.println("<h3>Select car options:</h3>");
+        out.println("<form action=\"TotalPrice.jsp\">");
+        out.println("<table border=\"2\" style=\"width:100%\">");
+		out.println("<tr>");
+		out.println("<td>Make/Model:</td>");
+		out.println("<td>" + modelname + "</td>");
+		out.println("</tr>");
+
+        for(String opsetname: opsetsname) {
+			out.println("<tr>");
+			out.println("<td>" + opsetname + "</td>");
+			out.println("<td>");
+
+			out.println("<select name=\""+ opsetname + "\">");
+			for(String option: auto.getOptionsName(opsetname)) {
+				out.println("<option value=\"" + option +"\">" + option + "</option>");
+			}
+			out.println("</select>");
+
+			out.println("</td>");
+			out.println("</tr>");
+		}
+        out.println("</table>");
+        out.println("<input type=\"submit\" value=\"Sumit\">");
+        out.println("</form>");
+        out.println("</body>");
+        out.println("</html>");
+
+    }
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+	    throws ServletException, IOException {
+	    doGet(request, response);
+	}
+
+
+}

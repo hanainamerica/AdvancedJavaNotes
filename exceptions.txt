@@ -1,0 +1,8 @@
+1.Missing make name.
+2.Missing model name.
+3.Missing baseprice data.
+4.Missing optionsets sizes.
+5.Missing Option data.
+6.Serialization failed.
+7.Missing cartype name.
+8.Missing year.
